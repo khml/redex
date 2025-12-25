@@ -21,6 +21,19 @@
 
 開発環境やテスト実行手順は `README.md` と `spec/`（または `test/`）内のファイルを参照してください。
 
+## 参照ドキュメント
+
+以下の設計ドキュメントはアーキテクチャ設計と実装の一次参照です。作業開始前や設計判断が必要な場合は必ず参照してください。
+
+- アーキテクチャ総覧: [docs/architecture.md](docs/architecture.md)
+- アーキテクチャ図（資産）: [docs/assets/architecture.svg](docs/assets/architecture.svg)
+- 設計決定ログ: [docs/decisions/0008_architecture_decision.md](docs/decisions/0008_architecture_decision.md)
+
+ガイド:
+- `docs/architecture.md` は主要コンポーネント、データフロー、`context`/`ruby_resolver` の統合仕様、テスト戦略を記載しています。実装やレビュー時はこのファイルを起点にしてください。
+- アーキテクチャ図は素早い理解のための視覚資産です。必要に応じて `docs/assets/` 内の図を更新し、図の更新理由を `docs/decisions/` に記録してください。
+- 重大な設計変更や方針決定は `docs/decisions/` にDecision Recordとして残してください。
+
 ---
 
 ## チケット運用ルール
