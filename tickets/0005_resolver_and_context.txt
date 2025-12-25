@@ -1,0 +1,16 @@
+チケット番号: 0005
+タイトル: context と ruby_resolver 統合実装
+
+概要:
+  - `context` 初期環境の取り扱い（数値以外でのエラー仕様を含む）
+  - `ruby_resolver` のシグネチャ `->(code_or_ident, context_hash)` を実装して統合
+  - 解決順序: スクリプト定義 → context → ruby_resolver を検証するテスト
+
+成果物:
+  - 実装コードの修正点（evaluator / resolver連携）
+  - `spec/resolver_context_spec.rb`
+
+見積り: 0.5〜1日
+依存: 0004
+担当: 未割当
+作成日: 2025-12-25

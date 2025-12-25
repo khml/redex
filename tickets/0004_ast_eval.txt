@@ -1,0 +1,17 @@
+チケット番号: 0004
+タイトル: ASTノードと評価器実装
+
+概要:
+  - ASTノード定義（Literal, Identifier, BinaryOp, Let/ConstStatement 等）
+  - 評価器 (`lib/redex/evaluator.rb`) の実装
+  - 基本的な算術評価と環境更新のテスト
+
+成果物:
+  - `lib/redex/ast.rb`
+  - `lib/redex/evaluator.rb`
+  - `spec/ast_eval_spec.rb`
+
+見積り: 1〜2日
+依存: 0003
+担当: 未割当
+作成日: 2025-12-25

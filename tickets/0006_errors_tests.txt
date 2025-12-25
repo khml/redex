@@ -1,0 +1,15 @@
+チケット番号: 0006
+タイトル: 例外クラスとエラーパスのテスト
+
+概要:
+  - `Redex::SyntaxError`, `Redex::NameError`, `Redex::EvaluationError` を定義
+  - 各種エラーパスの単体テストを追加（不正な文法、未定義識別子、無効なcontext等）
+
+成果物:
+  - `lib/redex/errors.rb` の実装/文書化
+  - `spec/errors_spec.rb`
+
+見積り: 0.5日
+依存: 0004,0005
+担当: 未割当
+作成日: 2025-12-25

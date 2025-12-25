@@ -1,0 +1,17 @@
+チケット番号: 0003
+タイトル: トークナイザおよび簡易パーサ実装
+
+概要:
+  - 空白区切りトークナイザの実装
+  - 最小限の文法に従うパーサ（<literal|ident|binary op|let/const>）
+  - パーサ出力の簡易テスト
+
+成果物:
+  - `lib/redex/tokenizer.rb`
+  - `lib/redex/parser.rb`
+  - `spec/tokenizer_parser_spec.rb`
+
+見積り: 1〜2日
+依存: 0002
+担当: 未割当
+作成日: 2025-12-25
