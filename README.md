@@ -8,3 +8,7 @@
 bundle install
 bundle exec rake
 ```
+
+## ドキュメント
+
+- 仕様（EBNF）: [docs/ebnf.md](docs/ebnf.md)
