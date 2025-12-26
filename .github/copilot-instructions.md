@@ -4,9 +4,6 @@
 
 本リポジトリはRubyで実装する「シンプル言語処理系」を目的とした軽量ライブラリ/ツールの開発リポジトリです。
 - 言語: Ruby 3.x 想定
-- 主な機能: 空白区切りトークンのパーサ、四則演算、`let`/`const`、ホスト（Ruby）呼び出しフック
-
-ドキュメントと要件は `docs/requirements/requirements_specification.md` にまとめられています。
 
 ---
 
@@ -17,22 +14,22 @@
 ドキュメントは `docs/` ディレクトリに格納されています。要件定義は特に以下を参照してください:
 
 - 要件定義: docs/requirements/requirements_specification.md
-- レビュー履歴: docs/requirements/review_history.md
-
-開発環境やテスト実行手順は `README.md` と `spec/`（または `test/`）内のファイルを参照してください。
-
-## 参照ドキュメント
 
 以下の設計ドキュメントはアーキテクチャ設計と実装の一次参照です。作業開始前や設計判断が必要な場合は必ず参照してください。
 
 - アーキテクチャ総覧: [docs/architecture.md](docs/architecture.md)
 - アーキテクチャ図（資産）: [docs/assets/architecture.svg](docs/assets/architecture.svg)
 - 設計決定ログ: [docs/decisions/0008_architecture_decision.md](docs/decisions/0008_architecture_decision.md)
+- 仕様（EBNF）: [docs/ebnf.md](docs/ebnf.md)
+- パーサ設計: [docs/parser.md](docs/parser.md)
+- トークナイザ設計: [docs/tokenizer.md](docs/tokenizer.md)
 
 ガイド:
 - `docs/architecture.md` は主要コンポーネント、データフロー、`context`/`ruby_resolver` の統合仕様、テスト戦略を記載しています。実装やレビュー時はこのファイルを起点にしてください。
 - アーキテクチャ図は素早い理解のための視覚資産です。必要に応じて `docs/assets/` 内の図を更新し、図の更新理由を `docs/decisions/` に記録してください。
 - 重大な設計変更や方針決定は `docs/decisions/` にDecision Recordとして残してください。
+
+開発環境やテスト実行手順は `README.md` と `spec/`（または `test/`）内のファイルを参照してください。
 
 ---
 
@@ -60,21 +57,12 @@
 - コードとドキュメントは日本語で記載（技術用語は英語可）。
  - ライブラリ配置: `lib/redex/` を想定。
 - テスト: `spec/` を推奨（RSpec）。最小限のユニットテストを必須とする。
-- 重要な設計決定（例: `context`/`ruby_resolver` 挙動、戻り値仕様）は `docs/requirements/requirements_specification.md` に記録する。
-
-以下は特に守るべきプロジェクト固有ルールです。
-
-- `context` と `ruby_resolver` の挙動:
-    - 識別子の解決順は `script 定義` → `context` → `ruby_resolver`
-    - `ruby_resolver` は `->(code_or_ident, context_hash)` のシグネチャを想定し、数値を返すこと
-    - `context` は呼び出し側が渡す初期環境（ハッシュ）で、数値以外を渡すと `Redex::EvaluationError` を投げる
-
-- 戻り値仕様（評価APIの返却形式）:
-    - 最低限 `result`（最終評価値）と `env`（評価後環境ハッシュ）を返す
-    - 可能なら `errors`（エラー配列）、`provenance`（識別子の出所）、`meta`（実行時間等）を含める
 
 実装へのコメントは適切に行ってください。コメント内容は日本語で記載し、コードの意図や設計判断を明確に説明してください。  
 MethodやClassのドキュメントコメントも同様に日本語で記載してください。YARD形式を推奨します。  
+
+実装行う場合は、他の実装コードを参考にし、スタイルを揃えるようにしてください。  
+ドキュメントの作成を行う場合も、同様に似た種類のドキュメントを確認し、構成などを揃えるようにしてください。  
 
 ---
 
@@ -83,7 +71,6 @@ MethodやClassのドキュメントコメントも同様に日本語で記載し
 - **チケットステータスセクションの編集**: ユーザーのみが更新可能
 - **完了チケットの再実装**: `tickets/done/` 内のチケットは対応しない
 - **ドキュメント未確認での実装**: 必ず関連ドキュメントを確認してから作業
-- **任意の識別子形式の変更**: ULID/UUID の使い分けは厳守
 
 ---
 
