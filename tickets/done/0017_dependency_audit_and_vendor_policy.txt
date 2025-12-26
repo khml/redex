@@ -1,0 +1,15 @@
+チケット: 0017_dependency_audit_and_vendor_policy
+
+概要:
+- `Gemfile` と `vendor/bundle` の現状を監査し、古い依存や脆弱性の有無を調査する。
+- `vendor/` をリポジトリに含める方針を決定する（維持するなら更新フロー、除去するなら .gitignore を更新）。
+
+影響度: 中
+
+関連ファイル:
+- Gemfile
+- vendor/bundle/
+
+推奨作業:
+- `bundle install`、`bundle update`、`bundle audit` を実行して結果を記録する。
+- vendor を含める場合は更新手順をドキュメント化。含めない場合は vendor を削除してコミット履歴を軽くする。

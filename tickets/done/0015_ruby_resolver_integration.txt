@@ -1,0 +1,16 @@
+チケット: 0015_ruby_resolver_integration
+
+概要:
+- `ruby_resolver` の統合 API を `lib/redex` に追加し、未解決識別子の解決フローを実装する。
+- `tickets/0005_resolver_and_context.txt` の仕様に合わせる（引数受け渡し、解決優先度、エラーハンドリング）。
+
+影響度: 高
+
+関連ファイル:
+- lib/redex/evaluator.rb
+- lib/redex/parser.rb
+- tickets/0005_resolver_and_context.txt
+
+推奨作業:
+- `ruby_resolver` を受け取るための引数/コールバック API を定義。
+- 未解決時の例外・ログの仕様を明文化し、テストを追加。

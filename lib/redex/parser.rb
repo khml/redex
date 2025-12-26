@@ -4,7 +4,9 @@ require_relative 'tokenizer'
 
 module Redex
   class Parser
-    class ParseError < StandardError; end
+    # ParseError は Redex::SyntaxError のエイリアスとして扱う
+    # 既存のコードとの互換性のために残す
+    ParseError = Redex::SyntaxError
 
     # 文字列またはトークン配列からASTを作成します。
     #

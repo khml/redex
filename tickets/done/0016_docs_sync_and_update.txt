@@ -1,0 +1,18 @@
+チケット: 0016_docs_sync_and_update
+
+概要:
+- `README.md` と `docs/` 以下（parser.md, tokenizer.md, ebnf.md, evaluator.md 等）の内容を同期し、API 使用例と戻り値仕様を統一する。
+
+影響度: 中
+
+関連ファイル:
+- README.md
+- docs/parser.md
+- docs/tokenizer.md
+- docs/ebnf.md
+- docs/evaluator.md
+
+推奨作業:
+- ドキュメント差分の箇所を一覧化し、どのドキュメントを正とするか決定。
+- 小さな修正文は docs 側で取りまとめ、サンプルコードを動作確認。
+- 更新履歴を `docs/decisions/` に残す。

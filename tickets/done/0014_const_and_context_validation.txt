@@ -1,0 +1,16 @@
+チケット: 0014_const_and_context_validation
+
+概要:
+- `const`（定数）への再代入を禁止するチェックを `lib/redex/evaluator.rb` に実装する。
+- `Evaluator` 実行時に `context` の全値が数値かどうかを検証し、非数値があれば例外を raise する。
+
+影響度: 高
+
+関連ファイル:
+- lib/redex/evaluator.rb
+- tickets/0005_resolver_and_context.txt
+- spec/ast_eval_spec.rb
+
+推奨作業:
+- `Evaluator` に再代入チェックロジックを追加し、既存テストを実行して副作用を確認。
+- 失敗ケースをカバーする単体テストを `spec/` に追加。

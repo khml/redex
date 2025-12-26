@@ -1,0 +1,18 @@
+チケット: 0013_align_requirements_and_impl
+
+概要:
+- `docs/requirements/requirements_specification.md` と現行実装 (`lib/redex/*.rb`) の仕様差分を解消する。
+- 主な差分: 括弧サポート、トークナイザの空白要件、const の不変性仕様など。
+
+影響度: 高
+
+関連ファイル:
+- docs/requirements/requirements_specification.md
+- docs/parser.md
+- lib/redex/parser.rb
+- lib/redex/tokenizer.rb
+
+推奨作業:
+- 要件側を正とするか実装側を正とするかの方針決定を行う。
+- 方針に基づき docs を更新するか、実装を修正する（小さな差分は実装で吸収可）。
+- 変更点を短い PR にまとめ、主要な API サンプルで動作確認を行う。

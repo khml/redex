@@ -1,0 +1,15 @@
+チケット: 0018_add_yard_comments
+
+概要:
+- `lib/redex/*.rb` の主要クラス/メソッドに日本語の YARD スタイルドキュメント（@param, @return 等）を追加する。
+- 優先対象: `Redex::Evaluator#initialize`, `Redex::Evaluator#eval`, `Redex::VERSION` 等。
+
+影響度: 低
+
+関連ファイル:
+- lib/redex/evaluator.rb
+- lib/redex/version.rb
+
+推奨作業:
+- 各メソッドに短い日本語説明と YARD タグを追加するPRを作成。
+- ドキュメント生成手順（`yard`）を README に追記。

@@ -36,10 +36,10 @@
 
 エラーハンドリング方針
 - 例外クラス階層:
-  - `Redex::Error`（基底）
-  - `Redex::EvaluationError`（評価時の型や解決エラー）
-  - `Redex::ParseError`（構文エラー）
-  - `Redex::TokenizerError`（字句解析エラー）
+  - `Redex::StandardError`（基底、Ruby の StandardError を継承）
+  - `Redex::EvaluationError`（評価時の型や解決エラー、実行時エラー）
+  - `Redex::NameError`（未定義識別子）
+  - `Redex::SyntaxError`（構文エラー、パース時）
 - 伝播ルール:
   - ライブラリAPIは例外を投げる（内部実装は捕捉して `errors` 配列に追加することが可能）
   - CLI/REPL 層は例外を受け取りユーザ向けに整形して表示する
