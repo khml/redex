@@ -13,7 +13,12 @@ module Redex
     # @param source [String, Array<Token>] パース対象（文字列の場合はトークナイズされます）
     # @return [Hash] 生成されたASTノード（最上位ノード）
     def self.parse(source)
-      tokens = source.is_a?(String) ? Tokenizer.tokenize(source) : source
+      if source.is_a?(String)
+        # 文字列入力はトークナイズして扱う（末尾改行の有無は問わない）
+        tokens = Tokenizer.tokenize(source)
+      else
+        tokens = source
+      end
       new(tokens).parse_program
     end
 
@@ -51,7 +56,25 @@ module Redex
     #
     # @return [Hash] プログラムのAST（トップレベルノード）
     def parse_program
-      parse_statement
+      nodes = []
+      while current
+        # 空行（改行トークン）をスキップ
+        if current.type == :newline
+          eat(:newline)
+          next
+        end
+
+        nodes << parse_statement
+
+        # 文の区切りは改行または入力終端のみ許容
+        if current && current.type == :newline
+          eat(:newline)
+        elsif current
+          raise ParseError, 'expected newline between statements'
+        end
+      end
+
+      nodes.length == 1 ? nodes.first : nodes
     end
 
     # 文（ステートメント）をパースします。

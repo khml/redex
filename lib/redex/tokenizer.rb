@@ -24,9 +24,16 @@ module Redex
       tokens = []
       i = 0
       while i < input.length
+        # 改行は文区切りとしてトークン化する（\n のみを対象）
+        if input[i] == "\n"
+          tokens << Token.new(:newline, "\n")
+          i += 1
+          next
+        end
+
         case input[i]
         when /\s/
-          # 空白は無視
+          # 空白は無視（改行は上で扱っているためここではその他の空白）
           i += 1
           next
         when /[0-9]/

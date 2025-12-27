@@ -30,6 +30,7 @@ tokens = Redex::Tokenizer.tokenize(input)
 - `:op` — 単一文字演算子（`+ - * / =`）。`value` は演算子文字列。
 - `:lparen` — 左括弧 `(`。`value` は "("。
 - `:rparen` — 右括弧 `)`。`value` は ")"。
+- `:newline` — 行区切り（"\n"）。パーサで文の区切りや空行判定に使用される。
 - `:unknown` — トークナイザで認識できない単一文字。`value` はその文字（例: 非ASCII 記号など）。
   型の詳細（`Redex::Tokenizer::Token` の `value` 型）:
 

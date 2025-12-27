@@ -21,6 +21,9 @@
 - `:op`      : 単一文字演算子（`+ - * / =`）
 - `:lparen`  : `(`
 - `:rparen`  : `)`
+- `:lparen`  : `(`
+- `:rparen`  : `)`
+- `:newline` : 行区切り（"\n"）。文の区切りや空行判定に使用される。
 - `:unknown` : 未知の文字（トークナイザはそのまま `:unknown` を返す）
 
 注: 将来的に文字列リテラル、浮動小数点、複合演算子などを追加する場合はここを拡張します。
@@ -39,7 +42,9 @@
 ## EBNF（構文）
 以下は拡張バッカス・ナウア記法（EBNF）での記述例です。必要に応じて左再帰除去や別表現に変換してください。
 
-Program     ::= Statement
+Program     ::= Statement { Newline Statement }
+
+Note: 実装上、複数行ソースは改行で区切られ、空行は無視されます。最終行の末尾改行は必須ではありません。
 
 Statement   ::= LetDecl | Expression
 

@@ -4,7 +4,7 @@
 
 ## 概要
 - 入力: 文字列（ソース）またはトークン配列
-- 出力: Ruby ハッシュで表現された AST ノード（トップレベルは単一の文/式）
+- 出力: Ruby ハッシュで表現された AST ノード（トップレベルは単一の文/式、または複数文を含む配列）
 - 例外: 構文エラー時は `Redex::Parser::ParseError` を発生させる
 
 ## サポートする構文
@@ -23,7 +23,7 @@
   - `Redex::Parser.parse(source)`
     - 引数: `source` — `String`（ソースコード）または `Array<Token>`（トークン列）
     - 動作: `String` の場合は内部で `Redex::Tokenizer.tokenize` を呼びトークナイズし、パーサインスタンスを生成して `parse_program` を実行します。
-    - 返値: AST を表す `Hash`（トップレベルノード）
+    - 返値: AST を表す `Hash`（単一文）または `Array<Hash>`（複数文のシーケンス）
     - 例外: 構文エラー時は `Redex::Parser::ParseError` を raise
     - パラメータ: `source`: `String | Array<Redex::Tokenizer::Token>` - 解析対象の入力
     - 戻り値: `Hash` - トップレベルの AST ノード（例: `{ type: :number, value: 1 }`）
@@ -40,7 +40,7 @@
 
 - `Redex::Parser.parse(source)`
   - 引数: `source` — `String` または `Array<Token>`（`Token` は `Tokenizer` の `Struct`）
-  - 戻り値: `Hash`（トップレベルの AST ノード）
+  - 戻り値: `Hash`（単一の文/式）または `Array<Hash>`（複数行の文を含むシーケンス）
   - 例外: 構文エラー時に `Redex::Parser::ParseError` を raise
   - 動作: `String` の場合は内部で `Redex::Tokenizer.tokenize` を呼んでトークナイズ後パースします。
 
@@ -58,7 +58,7 @@
     - 戻り値: `Redex::Tokenizer::Token` - 消費したトークン、期待値不一致時は `ParseError` を raise
 
   - `parse_program`
-    - 戻り値: `Hash` - トップレベルの AST ノード
+    - 戻り値: `Hash | Array<Hash>` - トップレベルの文/式、または複数文の配列
 
   - `parse_statement`, `parse_let`
     - 引数/戻り値: 内部の AST ハッシュを受け渡し・生成する（`Hash`）
@@ -126,7 +126,7 @@
   - 形: `{ type: :let, kind: :let | :const, name: Symbol, value: Hash }`
   - 例: `{ type: :let, kind: :let, name: :x, value: { type: :number, value: 10 } }`
 
-トップレベルの AST は上記ノードのいずれかのハッシュであり、現在は単一文/式のみを返します（将来的に複数文を配列で返す拡張が考えられます）。
+トップレベルの AST は上記ノードのいずれかのハッシュ、もしくは複数文を評価する場合は `Array<Hash>` を返します。パーサは改行（`:newline` トークン）を文の区切りとして扱い、空行は無視されます。最終行の末尾改行は必須ではありません。
 
 ## トークンとの関係
 

@@ -117,6 +117,22 @@ result = Redex::Evaluator.evaluate(ast)
 puts result[:result]  # => 3
 ```
 
+### 複数行ソースの扱い
+
+`Redex::Interpreter.evaluate` は複数行のソースを受け取れます。各行は独立した文（statement）として上から順に評価され、最終行の評価結果が `:result` に返されます。
+
+- 各行は通常改行（"\n"）で区切られますが、最終行の末尾改行は必須ではありません。
+- 空行（改行のみの行）は無視されます。
+- 既存の単一行インターフェースとは互換性があり、単一行（改行を含まない）の入力は従来どおり動作します。
+
+例:
+
+```ruby
+src = "let a = 1\nlet b = 2\na + b\n"
+res = Redex::Interpreter.evaluate(src)
+puts res[:result] # => 3
+```
+
 ## ドキュメント
 
 ### プロジェクトドキュメント

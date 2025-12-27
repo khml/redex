@@ -97,7 +97,14 @@ module Redex
     # @return [Hash] 評価結果の詳細情報
     def self.evaluate(node, env = {}, context: {}, ruby_resolver: nil)
       evaluator = new(env, context: context, ruby_resolver: ruby_resolver)
-      result = evaluator.eval(node)
+      result = nil
+      if node.is_a?(Array)
+        node.each do |n|
+          result = evaluator.eval(n)
+        end
+      else
+        result = evaluator.eval(node)
+      end
       
       # 詳細な戻り値を構築
       {
