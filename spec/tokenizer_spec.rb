@@ -51,4 +51,13 @@ RSpec.describe Redex::Tokenizer do
     expect(toks.map(&:type)).to eq([:ident, :op, :op, :ident])
     expect(toks.map(&:value)).to eq(['a', '+', '-', 'b'])
   end
+
+  # 浮動小数点リテラルのトークナイズ
+  # 観点: 小数点を含む数値リテラルが `:number` トークンとして返り、
+  #       値が Float として格納されることを検証する
+  it 'tokenizes float literals' do
+    toks = Redex::Tokenizer.tokenize('3.14 + x')
+    expect(toks.map(&:type)).to eq([:number, :op, :ident])
+    expect(toks.map(&:value)).to eq([3.14, '+', 'x'])
+  end
 end

@@ -142,4 +142,20 @@ RSpec.describe Redex::Evaluator do
       Redex::Evaluator.evaluate(ident, {}, ruby_resolver: resolver)
     }.to raise_error(Redex::EvaluationError, /must return numeric value/)
   end
+
+  # 浮動小数点を含む加算の評価
+  # 観点: `3.14 + 1` がおおむね `4.14` を返すこと（浮動小数点誤差を考慮）
+  it 'evaluates float arithmetic: 3.14 + 1 -> 4.14' do
+    ast = Redex::Parser.parse('3.14 + 1')
+    result = Redex::Evaluator.evaluate(ast)
+    expect(result[:result]).to be_within(1e-9).of(4.14)
+  end
+
+  # 浮動小数点を含む乗算の評価
+  # 観点: `0.5 * 2` が `1.0` を返すこと
+  it 'evaluates float arithmetic: 0.5 * 2 -> 1.0' do
+    ast = Redex::Parser.parse('0.5 * 2')
+    result = Redex::Evaluator.evaluate(ast)
+    expect(result[:result]).to eq(1.0)
+  end
 end
