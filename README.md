@@ -160,3 +160,121 @@ yard server
 ```
 
 生成されたドキュメントは `doc/` ディレクトリに出力されます。ブラウザで `http://localhost:8808` にアクセスして閲覧できます。
+
+## サンプルアプリケーション
+
+`examples/` ディレクトリには、Redex を実際のアプリケーションで活用する例が含まれています。
+
+### 1. CLI 電卓アプリ (`cli_calculator.rb`)
+
+対話型の計算機アプリケーション。標準入力、コマンドライン引数、パイプ入力に対応しています。
+
+```bash
+# 対話モード（REPL）
+ruby examples/cli_calculator.rb
+
+# コマンドライン引数で評価
+ruby examples/cli_calculator.rb "1 + 2 * 3"
+
+# パイプ入力
+echo "let x = 10\nx * 2" | ruby examples/cli_calculator.rb
+```
+
+機能:
+- 履歴表示 (`history` コマンド)
+- 環境リセット (`clear` コマンド)
+- ヘルプ表示 (`help` コマンド)
+- 変数・定数の永続化（セッション内）
+
+### 2. context と ruby_resolver の活用例 (`context_and_resolver.rb`)
+
+外部データや動的な値を Redex と連携する方法を示すサンプル集。
+
+```bash
+ruby examples/context_and_resolver.rb
+```
+
+含まれる例:
+- context を使った外部データの注入
+- ruby_resolver による動的値の解決（現在時刻、ランダム値など）
+- context と ruby_resolver の併用
+- 解決の優先順位の確認
+- 実用的なユースケース（設定ファイルの式評価）
+
+### 3. Sinatra Web API (`sinatra_demo.rb`)
+
+HTTP API として Redex を公開する例。JSON で式を受け取り、評価結果を JSON で返します。
+
+```bash
+# Sinatra のインストール（初回のみ）
+gem install sinatra
+
+# サーバー起動
+ruby examples/sinatra_demo.rb
+```
+
+使用例:
+
+```bash
+# 単一式の評価
+curl -X POST http://localhost:4567/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{"expression": "1 + 2 * 3"}'
+
+# context を使った評価
+curl -X POST http://localhost:4567/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{"expression": "x + y", "context": {"x": 10, "y": 5}}'
+
+# バッチ評価
+curl -X POST http://localhost:4567/evaluate/batch \
+  -H "Content-Type: application/json" \
+  -d '{"expressions": ["1 + 1", "2 * 3", "10 / 2"]}'
+```
+
+エンドポイント:
+- `GET /` - API 情報
+- `GET /health` - ヘルスチェック
+- `POST /evaluate` - 式の評価
+- `POST /evaluate/batch` - バッチ評価
+
+**セキュリティ警告**: このサンプルは教育目的です。本番環境では以下の対策が必要です:
+- 入力サイズの制限（実装済み）
+- レート制限
+- タイムアウト設定
+- HTTPS の使用
+- 認証・認可の実装
+
+### 4. Rake タスク統合 (`rake_task.rb`)
+
+ビルドプロセスで設定値を式で計算する例。
+
+```bash
+# Rakefile に require して使用
+# require_relative 'examples/rake_task'
+
+# または直接実行
+bundle exec rake -f examples/rake_task.rb config:generate
+bundle exec rake -f examples/rake_task.rb config:validate
+bundle exec rake -f examples/rake_task.rb config:from_env
+```
+
+ユースケース:
+- ビルド時に設定ファイルを動的に生成
+- 環境変数から設定値を計算
+- デプロイ前の設定値の検証
+
+タスク:
+- `config:generate` - システム情報から設定ファイルを生成
+- `config:validate` - 設定式の妥当性を検証
+- `config:show` - 現在の設定値を表示
+- `config:from_env` - 環境変数から設定値を計算
+
+### サンプルの動作確認
+
+各サンプルには対応する spec ファイルがあり、動作確認ができます:
+
+```bash
+# 全サンプルのテストを実行
+bundle exec rspec spec/examples_spec.rb
+```
