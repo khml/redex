@@ -7,6 +7,22 @@
 - 出力: Ruby ハッシュで表現された AST ノード（トップレベルは単一の文/式、または複数文を含む配列）
 - 例外: 構文エラー時は `Redex::Parser::ParseError` を発生させる
 
+```mermaid
+flowchart TD
+    A[入力] --> B{String or Array?}
+    B -->|String| C[Tokenizer.tokenize]
+    C --> D[トークン配列]
+    B -->|Array| D
+    D --> E[Parser インスタンス生成]
+    E --> F[parse_program 実行]
+    F --> G{複数文?}
+    G -->|Yes| H[Array of AST Nodes]
+    G -->|No| I[Single AST Node]
+    
+    style C fill:#e1f5ff
+    style F fill:#ffe1e1
+```
+
 ## サポートする構文
 - 数値リテラル（例: 42）
 - 識別子（例: x, total）
@@ -81,6 +97,27 @@
 ## AST ノード仕様
 
 パーサが生成する主要なノード（Ruby ハッシュ）:
+
+```mermaid
+graph TD
+    AST[AST Node] --> NUM[数値ノード<br/>type: :number]
+    AST --> IDENT[識別子ノード<br/>type: :ident]
+    AST --> BIN[二項演算ノード<br/>type: :binary]
+    AST --> LET[let/const宣言ノード<br/>type: :let]
+    
+    NUM --> NUMVAL[value: Integer/String]
+    IDENT --> IDENTNAME[name: Symbol]
+    BIN --> BINOP["op: +/-/*/÷"]
+    BIN --> BINLR[left/right: Node]
+    LET --> LETKIND[kind: :let/:const]
+    LET --> LETNAME[name: Symbol]
+    LET --> LETVAL[value: Node]
+    
+    style NUM fill:#d4f1d4
+    style IDENT fill:#d4e4f1
+    style BIN fill:#f1e4d4
+    style LET fill:#f1d4e4
+```
 
 - 数値ノード
 

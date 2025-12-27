@@ -24,6 +24,27 @@ tokens = Redex::Tokenizer.tokenize(input)
 
 ## 認識するトークン種別
 
+```mermaid
+graph TB
+    INPUT[入力文字列] --> SCAN[文字スキャン]
+    SCAN --> CHECK{文字種判定}
+    
+    CHECK -->|数字| NUM[":number<br/>(Integer)"]
+    CHECK -->|英字/アンダースコア| WORD{キーワード?}
+    WORD -->|Yes| KW[":keyword<br/>(let/const)"]
+    WORD -->|No| ID[":ident<br/>(String)"]
+    CHECK -->|演算子| OP[":op<br/>(+/-/*/÷/=)"]
+    CHECK -->|左括弧| LP[":lparen<br/>'('"]
+    CHECK -->|右括弧| RP[":rparen<br/>')'"]
+    CHECK -->|改行| NL[":newline<br/>'\n'"]
+    CHECK -->|その他| UNK[":unknown<br/>(未知文字)"]
+    
+    style NUM fill:#d4f1d4
+    style KW fill:#f1d4d4
+    style ID fill:#d4e4f1
+    style OP fill:#f1e4d4
+```
+
 - `:number` — 整数リテラル（`value` は Ruby の `Integer`）。現在は整数のみ対応。
 - `:ident` — 識別子（英数字とアンダースコア）。`value` は文字列。
 - `:keyword` — キーワード（現時点では `let`, `const`）。`value` は文字列。

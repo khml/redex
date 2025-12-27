@@ -23,8 +23,35 @@
 2. トークン配列を `parser` に渡す → AST
 3. ASTと初期 `context` を `evaluator` に渡す → 評価結果 (`result`, `env`, ...)
 
+```mermaid
+graph LR
+    A[ソース文字列] --> B[Tokenizer]
+    B --> C[トークン配列]
+    C --> D[Parser]
+    D --> E[AST]
+    E --> F[Evaluator]
+    G[context] --> F
+    H[ruby_resolver] --> F
+    F --> I[評価結果<br/>result, env, provenance]
+```
+
 `context` と `ruby_resolver` の設計（重要）
 - 解決順序: スクリプト内定義（ローカル） → `context` → `ruby_resolver`
+
+```mermaid
+flowchart TD
+    A[識別子の解決] --> B{スクリプト内定義<br/>env にあるか?}
+    B -->|Yes| C[env から値を取得]
+    B -->|No| D{context にあるか?}
+    D -->|Yes| E[context から値を取得]
+    D -->|No| F{ruby_resolver<br/>が定義されているか?}
+    F -->|Yes| G[ruby_resolver を呼び出し]
+    G --> H{戻り値が数値か?}
+    H -->|Yes| I[その値を使用]
+    H -->|No/nil| J[NameError を発生]
+    F -->|No| J
+```
+
 - `context`:
   - 呼び出し側が渡す初期環境を表すハッシュ
   - 値は数値のみ許容。数値以外が渡された場合は `Redex::EvaluationError` を発生させる
@@ -40,6 +67,32 @@
   - `Redex::EvaluationError`（評価時の型や解決エラー、実行時エラー）
   - `Redex::NameError`（未定義識別子）
   - `Redex::SyntaxError`（構文エラー、パース時）
+
+```mermaid
+classDiagram
+    StandardError <|-- Redex_StandardError
+    Redex_StandardError <|-- Redex_EvaluationError
+    Redex_StandardError <|-- Redex_NameError
+    Redex_StandardError <|-- Redex_SyntaxError
+    
+    class StandardError {
+        <<Ruby組み込み>>
+    }
+    class Redex_StandardError {
+        基底例外クラス
+    }
+    class Redex_EvaluationError {
+        評価時エラー
+        型エラー、実行時エラー
+    }
+    class Redex_NameError {
+        未定義識別子エラー
+    }
+    class Redex_SyntaxError {
+        構文エラー
+    }
+```
+
 - 伝播ルール:
   - ライブラリAPIは例外を投げる（内部実装は捕捉して `errors` 配列に追加することが可能）
   - CLI/REPL 層は例外を受け取りユーザ向けに整形して表示する

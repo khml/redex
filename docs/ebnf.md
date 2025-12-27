@@ -42,6 +42,33 @@
 ## EBNF（構文）
 以下は拡張バッカス・ナウア記法（EBNF）での記述例です。必要に応じて左再帰除去や別表現に変換してください。
 
+```mermaid
+graph TD
+    PROG[Program] --> STMT[Statement]
+    STMT --> CHOICE{種別}
+    
+    CHOICE -->|宣言| LET[LetDecl]
+    CHOICE -->|式| EXPR[Expression]
+    
+    LET --> KEYW[let/const]
+    LET --> IDENT1[Identifier]
+    LET --> EQ["="]
+    LET --> EXPR1[Expression]
+    
+    EXPR --> ADD[AddSub]
+    ADD --> MUL[MulDiv]
+    MUL --> PRIM[Primary]
+    
+    PRIM --> CHOICE2{種別}
+    CHOICE2 -->|数値| NUM[Number]
+    CHOICE2 -->|識別子| IDENT2[Identifier]
+    CHOICE2 -->|括弧| PAREN["( Expression )"]
+    
+    style LET fill:#f1d4e4
+    style EXPR fill:#d4e4f1
+    style NUM fill:#d4f1d4
+```
+
 Program     ::= Statement { Newline Statement }
 
 Note: 実装上、複数行ソースは改行で区切られ、空行は無視されます。最終行の末尾改行は必須ではありません。
@@ -76,6 +103,34 @@ Identifier  ::= <ident>
     [(:keyword, "let"), (:ident, "x"), (:op, "="), (:number, 1), (:op, "+"), (:number, 2), (:op, "*"), (:lparen, "("), (:number, 3), (:op, "+"), (:number, 4), (:rparen, ")")]
 
 簡易 AST（`lib/redex/parser.rb` が返す形式）:
+
+```mermaid
+graph TD
+    ROOT["{ type: :let }"] --> KIND["kind: :let"]
+    ROOT --> NAME["name: :x"]
+    ROOT --> VALUE["value: { type: :binary }"]
+    
+    VALUE --> OP1["op: '+'"]
+    VALUE --> LEFT1["left: { type: :number, value: 1 }"]
+    VALUE --> RIGHT1["right: { type: :binary }"]
+    
+    RIGHT1 --> OP2["op: '*'"]
+    RIGHT1 --> LEFT2["left: { type: :number, value: 2 }"]
+    RIGHT1 --> RIGHT2["right: { type: :binary }"]
+    
+    RIGHT2 --> OP3["op: '+'"]
+    RIGHT2 --> LEFT3["left: { type: :number, value: 3 }"]
+    RIGHT2 --> RIGHT3["right: { type: :number, value: 4 }"]
+    
+    style ROOT fill:#f1d4e4
+    style VALUE fill:#f1e4d4
+    style RIGHT1 fill:#f1e4d4
+    style RIGHT2 fill:#f1e4d4
+    style LEFT1 fill:#d4f1d4
+    style LEFT2 fill:#d4f1d4
+    style LEFT3 fill:#d4f1d4
+    style RIGHT3 fill:#d4f1d4
+```
 
     {
       :type => :let,

@@ -8,6 +8,38 @@
 - 出力: 詳細な評価結果（`result`, `env`, `provenance`, `errors`, `diagnostics`, `meta`）
 - 例外: 評価時のエラーは `Redex::EvaluationError`, `Redex::NameError`, `Redex::SyntaxError` を raise
 
+```mermaid
+flowchart TD
+    A[AST Node] --> B{ノード種別}
+    
+    B -->|:number| C[値をそのまま返す]
+    
+    B -->|:ident| D[識別子解決<br/>env → context → ruby_resolver]
+    D --> E{解決成功?}
+    E -->|Yes| F[値を返す]
+    E -->|No| G[NameError]
+    
+    B -->|:binary| H[左右を再帰評価]
+    H --> I[演算実行]
+    I --> J{演算成功?}
+    J -->|Yes| K[結果を返す]
+    J -->|No| L[EvaluationError<br/>ゼロ除算等]
+    
+    B -->|:let| M[value を評価]
+    M --> N{const再代入?}
+    N -->|Yes| O[EvaluationError]
+    N -->|No| P[env に格納]
+    P --> Q[値を返す]
+    
+    style C fill:#d4f1d4
+    style F fill:#d4f1d4
+    style K fill:#d4f1d4
+    style Q fill:#d4f1d4
+    style G fill:#f1d4d4
+    style L fill:#f1d4d4
+    style O fill:#f1d4d4
+```
+
 ## サポートする機能
 - リテラル評価: `:number` ノード
 - 識別子参照: `:ident` ノード（環境、context、ruby_resolver から値を取得）
@@ -127,6 +159,24 @@ Evaluator が受け取る `node` はパーサが生成する上記の AST ハッ
 ## 戻り値の構造
 
 `Evaluator.evaluate` は以下のキーを持つハッシュを返します:
+
+```mermaid
+graph TB
+    RESULT[評価結果ハッシュ] --> RES[:result<br/>評価値 Numeric]
+    RESULT --> ENV[:env<br/>評価後環境 Hash]
+    RESULT --> PROV[:provenance<br/>識別子出所 Hash]
+    RESULT --> ERR[:errors<br/>エラー配列 Array]
+    RESULT --> DIAG[:diagnostics<br/>診断情報 Array]
+    RESULT --> META[:meta<br/>メタ情報 Hash]
+    
+    ENV --> ENVEX["例: {x: 10, y: 20}"]
+    PROV --> PROVEX["例: {x: 'script', y: 'context'}"]
+    META --> METAEX["例: {version: '0.1.0'}"]
+    
+    style RES fill:#d4f1d4
+    style ENV fill:#d4e4f1
+    style PROV fill:#f1e4d4
+```
 
 - `:result` — 評価結果の数値
 - `:env` — 評価後の環境（変数/定数のハッシュ）
