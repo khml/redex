@@ -49,6 +49,33 @@
   - const 不変性: `const` で定義された名前への再代入を試みると `Redex::EvaluationError` を発生
   - 数値検証: 代入される値が数値でない場合は `Redex::EvaluationError` を発生
 
+### AST / 評価入力（期待されるハッシュ構造）
+
+Evaluator が受け取る `node` はパーサが生成する上記の AST ハッシュです。代表的な構造は `docs/parser.md` の "AST ハッシュ構造（詳細）" を参照してください。例を繰り返すと:
+
+- 数値ノード: `{ type: :number, value: 3 }`
+- 識別子ノード: `{ type: :ident, name: :x }`
+- 二項ノード: `{ type: :binary, op: "+", left: <node>, right: <node> }`
+
+### `Evaluator.evaluate` の戻り値ハッシュ（構造例）
+
+`Evaluator.evaluate` は詳細な情報を含むハッシュを返します。各キーの期待型と例を示します。
+
+- `:result` => `Numeric` - 評価結果の数値
+  - 例: `7`
+- `:env` => `Hash<Symbol, Numeric>` - 評価後の環境（変数/定数マップ）
+  - 例: `{ x: 10 }`
+- `:provenance` => `Hash<Symbol, String>` - 各識別子の出所
+  - 例: `{ x: "script", y: "context" }`
+- `:errors` => `Array<Hash>` - エラー情報オブジェクトの配列（将来的に詳細化）
+  - 例: `[]` または `[ { type: "EvaluationError", message: "division by zero" } ]`
+- `:diagnostics` => `Array<Hash>` - 診断情報の配列
+  - 例: `[]`
+- `:meta` => `Hash` - メタ情報（例: `:version` => `String`）
+  - 例: `{ version: "0.1.0" }`
+
+上記は現在の実装で返されるハッシュの形のおおよその仕様です。将来的に `:errors` / `:diagnostics` のオブジェクト仕様をより厳密に定義する予定です。
+
 ## 環境（env）と context の仕様
 - Evaluator は初期環境として普通の Ruby ハッシュを受け取る（例: `{ x: 1 }`）。
 - 環境のキーはシンボルを期待する（Parser は `name` を `to_sym` で格納する）。
@@ -60,24 +87,42 @@
 
 - クラス: `Redex::Evaluator`
 
-- コンストラクタ
+ - コンストラクタ
 
   - `Evaluator.new(env = {}, context: {}, ruby_resolver: nil)` — 評価器インスタンスを生成
-    - `env`: 初期環境（Hash、キーはシンボル）
-    - `context`: 外部から提供される初期値（Hash、キーは文字列またはシンボル、値は数値）
-    - `ruby_resolver`: 未解決識別子を解決するコールバック（Proc、シグネチャ: `->(name, context) { numeric_value }`）
+    - `env`: `Hash<Symbol, Numeric>` - 初期環境（キーは `Symbol`、値は `Integer` または `Float`）
+    - `context`: `Hash<String|Symbol, Numeric>` - 外部から提供される初期値（キーは `String` または `Symbol`、値は数値）
+    - `ruby_resolver`: `Proc` (シグネチャ: `(name: String, context: Hash) -> Numeric | nil`) - 未解決識別子を動的に解決するコールバック
 
 - インスタンスメソッド
 
   - `#eval(node)` — 指定した AST ノードを評価して結果（数値）を返す。例外は各種エラークラスを発生させる。
+    - 引数: `node`: `Hash`（AST ノード） - パーサが生成するノード（例: `{ type: :number, value: 1 }` 等）
+    - 戻り値: `Numeric` (`Integer` | `Float`) - 評価結果の数値
   - `#env` — 現在の評価環境のコピーを返す（読み取り専用）
+    - 戻り値: `Hash<Symbol, Numeric>` - 現在の環境の浅いコピー（キーは `Symbol`）
   - `#provenance` — 各識別子の出所情報のコピーを返す（読み取り専用）
+    - 戻り値: `Hash<Symbol, String>` - 各識別子名 => 出所文字列(`"script"`, `"context"`, `"ruby_resolver"`)
 
 - クラスメソッド
 
   - `Evaluator.evaluate(node, env = {}, context: {}, ruby_resolver: nil)` — 便宜的ラッパー。
     - 内部で `new(env, context: context, ruby_resolver: ruby_resolver).eval(node)` を実行
     - 詳細な評価結果をハッシュで返す（`:result`, `:env`, `:provenance`, `:errors`, `:diagnostics`, `:meta`）
+    - 引数: `node`: `Hash`（AST ノード）
+    - 引数: `env`: `Hash<Symbol, Numeric>` - 初期環境
+    - 引数: `context`: `Hash<String|Symbol, Numeric>` - 外部コンテキスト
+    - 引数: `ruby_resolver`: `Proc` - 未解決識別子解決用コールバック
+    - 戻り値: `Hash` - 詳細な評価結果のハッシュ（型詳細は下記）
+
+  戻り値の構造 (型):
+
+  - `:result` => `Numeric` - 評価結果の数値
+  - `:env` => `Hash<Symbol, Numeric>` - 評価後の環境
+  - `:provenance` => `Hash<Symbol, String>` - 各識別子の出所
+  - `:errors` => `Array<Hash>` - エラー情報オブジェクトの配列（将来仕様拡張）
+  - `:diagnostics` => `Array<Hash>` - 診断情報の配列
+  - `:meta` => `Hash` - メタ情報（例: `:version` => `String`）
 
 ## 戻り値の構造
 

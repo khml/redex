@@ -9,6 +9,8 @@
 - `Redex::Tokenizer.tokenize(input)`
   - 引数: `input` (String)
   - 戻り値: `Array<Redex::Tokenizer::Token>`（各要素は `:type` と `:value` を持つ `Struct`）
+  - パラメータ: `input`: `String` - トークナイズ対象のソース文字列
+  - 戻り値: `Array<Redex::Tokenizer::Token>` - `Token` は `Struct.new(:type, :value)` で表現される
 
 例:
 
@@ -29,6 +31,14 @@ tokens = Redex::Tokenizer.tokenize(input)
 - `:lparen` — 左括弧 `(`。`value` は "("。
 - `:rparen` — 右括弧 `)`。`value` は ")"。
 - `:unknown` — トークナイザで認識できない単一文字。`value` はその文字（例: 非ASCII 記号など）。
+  型の詳細（`Redex::Tokenizer::Token` の `value` 型）:
+
+  - `:number` => `Integer`（将来的に `Float` を含める可能性あり）
+  - `:ident`  => `String`
+  - `:keyword` => `String`
+  - `:op` => `String`（単一文字）
+  - `:lparen`, `:rparen` => `String` ("(" / ")")
+  - `:unknown` => `String`（未知文字）
 
 ## 未知文字の扱い
 

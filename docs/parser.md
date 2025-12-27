@@ -25,6 +25,9 @@
     - 動作: `String` の場合は内部で `Redex::Tokenizer.tokenize` を呼びトークナイズし、パーサインスタンスを生成して `parse_program` を実行します。
     - 返値: AST を表す `Hash`（トップレベルノード）
     - 例外: 構文エラー時は `Redex::Parser::ParseError` を raise
+    - パラメータ: `source`: `String | Array<Redex::Tokenizer::Token>` - 解析対象の入力
+    - 戻り値: `Hash` - トップレベルの AST ノード（例: `{ type: :number, value: 1 }`）
+    - 例外: `Redex::Parser::ParseError`
 
 
 # パーサ（Parser）
@@ -40,6 +43,29 @@
   - 戻り値: `Hash`（トップレベルの AST ノード）
   - 例外: 構文エラー時に `Redex::Parser::ParseError` を raise
   - 動作: `String` の場合は内部で `Redex::Tokenizer.tokenize` を呼んでトークナイズ後パースします。
+
+  型注釈（主なメソッド）:
+
+  - `initialize(tokens)`
+    - 引数: `tokens`: `Array<Redex::Tokenizer::Token>` - トークン列
+    - 戻り値: `Redex::Parser` インスタンス（コンストラクタのため暗黙的）
+
+  - `current`
+    - 戻り値: `Redex::Tokenizer::Token | nil` - 現在のトークン
+
+  - `eat(expected_type = nil)`
+    - 引数: `expected_type`: `Symbol | nil` - 期待するトークン種別
+    - 戻り値: `Redex::Tokenizer::Token` - 消費したトークン、期待値不一致時は `ParseError` を raise
+
+  - `parse_program`
+    - 戻り値: `Hash` - トップレベルの AST ノード
+
+  - `parse_statement`, `parse_let`
+    - 引数/戻り値: 内部の AST ハッシュを受け渡し・生成する（`Hash`）
+
+  - `parse_expression`, `parse_add_sub`, `parse_mul_div`, `parse_primary`
+    - 引数: なし（内部状態のトークン列を利用）
+    - 戻り値: `Hash` - 部分木の AST ノード
 
 ### インスタンスメソッド（主なもの・振る舞い）
 
@@ -73,6 +99,34 @@
   { type: :let, kind: :let|:const, name: :symbol_name, value: <node> }
 
 注: `value` の数値は `Tokenizer` の実装により `Integer` になる場合があります。`name` はシンボル（`to_sym`）で格納されます。
+
+## AST ハッシュ構造（詳細）
+
+パーサが返す AST は Ruby の `Hash` で表現され、各ノードは共通して `:type` キーを持ちます。以下は各ノードの期待されるハッシュ構造と具体例です。
+
+- 数値ノード
+
+  - 形: `{ type: :number, value: Integer }`
+  - 例: `{ type: :number, value: 42 }`
+
+- 識別子ノード
+
+  - 形: `{ type: :ident, name: Symbol }`
+  - 例: `{ type: :ident, name: :x }`
+
+- 二項演算ノード
+
+  - 形: `{ type: :binary, op: String, left: Hash, right: Hash }`
+    - `op` は `"+"`, `"-"`, `"*"`, `"/"` のいずれか
+    - `left` / `right` は再帰的に同様のノードハッシュを持つ
+  - 例: `{ type: :binary, op: "+", left: { type: :number, value: 1 }, right: { type: :number, value: 2 } }`
+
+- let/const 宣言ノード
+
+  - 形: `{ type: :let, kind: :let | :const, name: Symbol, value: Hash }`
+  - 例: `{ type: :let, kind: :let, name: :x, value: { type: :number, value: 10 } }`
+
+トップレベルの AST は上記ノードのいずれかのハッシュであり、現在は単一文/式のみを返します（将来的に複数文を配列で返す拡張が考えられます）。
 
 ## トークンとの関係
 
